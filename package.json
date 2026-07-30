@@ -1,0 +1,15 @@
+{
+  "name": "peekaboo-pricing-v2",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI Peekaboo pricing page: one plan, sliders, graduated data-point pricing.",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "node build.mjs",
+    "serve": "python3 -m http.server 7898 --bind 127.0.0.1"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.8"
+  }
+}
