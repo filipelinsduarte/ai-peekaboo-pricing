@@ -228,6 +228,28 @@
 
   @media (max-width: 900px) { .calc { grid-template-columns: 1fr; max-width: 520px; } }
 
+  /* Handwritten margin note beside the card, its arrow curving in to the
+     tracking-frequency control. Shown only when the viewport leaves enough
+     room beside the card that it cannot cause horizontal overflow. */
+  .freq-note {
+    display: none;
+    position: absolute;
+    top: 263px; right: -205px;
+    width: 175px;
+    z-index: 3;
+    pointer-events: none;
+  }
+  @media (min-width: 1432px) { .freq-note { display: block; } }
+  .freq-note-text {
+    margin: 0 0 2px;
+    font-family: 'Caveat', cursive;
+    font-size: 22px; font-weight: 600; line-height: 1.2;
+    color: var(--ink);
+    transform: rotate(-2.5deg);
+    text-wrap: pretty;
+  }
+  .freq-note-arrow { display: block; margin-left: -18px; color: var(--ink); }
+
   /* Left: the answer first (price, CTA, what's included) */
   .calc-summary {
     position: relative; z-index: 2;
@@ -1094,7 +1116,14 @@
 
       </div>
 
-
+      <!-- Margin doodle pointing at the frequency control -->
+      <div class="freq-note">
+        <p class="freq-note-text">Want to track more prompts but don't want to break your wallet? Change the tracking frequency</p>
+        <svg class="freq-note-arrow" width="150" height="132" viewBox="0 0 150 132" fill="none" aria-hidden="true">
+          <path d="M132 6 C 130 56, 104 102, 30 109" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M48 96 L 28 109 L 50 120" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
 
     </div>
   </div>
