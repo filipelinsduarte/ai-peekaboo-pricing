@@ -50,8 +50,15 @@
     { upTo: Infinity, ratePer1k: 16.67 }
   ];
 
-  // Yearly billing gives 2 months free (pay for 10, get 12).
-  var YEARLY_MONTHS_CHARGED = 10;
+  // Annual billing takes 15% off the monthly figure, paid up front for 12
+  // months (Filipe switched from 2-months-free to a flat 15% on 2026-08-18).
+  var ANNUAL_DISCOUNT = 0.15;
+
+  // From this monthly LIST price up, the plan includes the premium reporting
+  // features (Looker Studio integration, white label client reporting). Keyed
+  // on the undiscounted monthly figure, same as BOOK_MEETING_FROM, so the
+  // annual toggle cannot flip a feature in and out.
+  var PREMIUM_FEATURES_FROM = 100;
 
   // From this monthly LIST price up, the page swaps the self-serve trial CTA
   // for "Book a meeting". Keyed on the undiscounted monthly figure so the
@@ -254,7 +261,7 @@
 
     var isYearly = billing === 'yearly';
     var perMonth = isYearly
-      ? Math.round((monthly * YEARLY_MONTHS_CHARGED) / 12)
+      ? Math.round(monthly * (1 - ANNUAL_DISCOUNT))
       : monthly;
     var billedNow = isYearly ? perMonth * 12 : monthly;
     var yearlySaving = isYearly ? monthly * 12 - billedNow : 0;
@@ -279,7 +286,8 @@
       effectiveRatePer1k: dp > 0 ? monthly / (dp / 1000) : 0,
       perBrand: b > 0 ? Math.round(perMonth / b) : 0,
       overMaxBrands: b > MAX_BRANDS,
-      bookMeeting: monthly >= BOOK_MEETING_FROM
+      bookMeeting: monthly >= BOOK_MEETING_FROM,
+      premiumIncluded: monthly >= PREMIUM_FEATURES_FROM
     };
   }
 
@@ -292,7 +300,8 @@
     FREQUENCIES: FREQUENCIES,
     DEFAULT_FREQUENCY: DEFAULT_FREQUENCY,
     BRACKETS: BRACKETS,
-    YEARLY_MONTHS_CHARGED: YEARLY_MONTHS_CHARGED,
+    ANNUAL_DISCOUNT: ANNUAL_DISCOUNT,
+    PREMIUM_FEATURES_FROM: PREMIUM_FEATURES_FROM,
     BOOK_MEETING_FROM: BOOK_MEETING_FROM,
     MIN_PRICE: MIN_PRICE,
     MIN_DATA_POINTS: MIN_DATA_POINTS,

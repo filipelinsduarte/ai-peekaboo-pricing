@@ -182,11 +182,17 @@ describe('pricing behaves sanely as you scale', () => {
   });
 });
 
-describe('yearly billing', () => {
+describe('annual billing (15% off the monthly figure)', () => {
   it('is cheaper per month than monthly billing', () => {
     const m = price(3, 100, 'daily', 'monthly');
     const y = price(3, 100, 'daily', 'yearly');
     expect(y.perMonth).toBeLessThan(m.perMonth);
+  });
+
+  it('applies exactly 15% off: the $100 anchor plan reads $85/mo on annual', () => {
+    const y = price(1, 40, 'daily', 'yearly');
+    expect(y.monthly).toBe(100);
+    expect(y.perMonth).toBe(85);
   });
 
   it('bills 12x the discounted monthly figure up front', () => {
@@ -194,10 +200,47 @@ describe('yearly billing', () => {
     expect(y.billedNow).toBe(y.perMonth * 12);
   });
 
+  it('reports the yearly saving as 12 list months minus the upfront bill', () => {
+    const y = price(1, 40, 'daily', 'yearly');
+    expect(y.billedNow).toBe(1020);
+    expect(y.yearlySaving).toBe(100 * 12 - 1020);
+  });
+
+  it('rounds the discounted per-month figure to a whole dollar', () => {
+    // $29 floor plan: 29 * 0.85 = 24.65 -> $25/mo, $300 up front.
+    const y = price(1, 11, 'daily', 'yearly');
+    expect(y.monthly).toBe(29);
+    expect(y.perMonth).toBe(25);
+    expect(y.billedNow).toBe(300);
+  });
+
   it('charges the full monthly figure when billed monthly', () => {
     const m = price(1, 40, 'daily', 'monthly');
     expect(m.perMonth).toBe(100);
     expect(m.billedNow).toBe(100);
+  });
+});
+
+describe('premium features (Looker Studio, white label) from $100/mo', () => {
+  it('is excluded below $100/mo', () => {
+    // The $29 floor plan and a $50 plan both sit under the threshold.
+    expect(price(1, 11, 'daily').premiumIncluded).toBe(false);
+    expect(price(1, 40, 'alt').monthly).toBe(50);
+    expect(price(1, 40, 'alt').premiumIncluded).toBe(false);
+  });
+
+  it('is included at exactly $100/mo and above', () => {
+    const p = price(1, 40, 'daily');
+    expect(p.monthly).toBe(100);
+    expect(p.premiumIncluded).toBe(true);
+    expect(price(1, 100, 'daily').premiumIncluded).toBe(true);
+  });
+
+  it('keys on the monthly LIST price, so the annual toggle cannot flip it', () => {
+    // Annual shows $85/mo for the $100 plan, but the plan is still a $100 plan.
+    const y = price(1, 40, 'daily', 'yearly');
+    expect(y.perMonth).toBe(85);
+    expect(y.premiumIncluded).toBe(true);
   });
 });
 
